@@ -1,3 +1,4 @@
+{% load static %}
 <!DOCTYPE html>
 <html>
     <head>
@@ -5,45 +6,60 @@
     </head>
     <body>
 
-    <h1>My First Heading</h1>
-    <p>My first paragraph.</p>
+    <h1>Dgroup Tree</h1>
+    <img src="{% static 'dgroup/images/cats/cat1.png' %}"></img>
+
+    <div id="myDiagramDiv"></div>
 
     <script>
-        const myDiagram =
-    new go.Diagram("myDiagramDiv",
-        { // enable Ctrl-Z to undo and Ctrl-Y to redo
-        "undoManager.isEnabled": true
-        });
+        const myDiagram = new go.Diagram("myDiagramDiv",
+  {
+    "undoManager.isEnabled": true,
+    layout: new go.TreeLayout({ angle: 90, layerSpacing: 35 })
+  });
 
-    // define a simple Node template
-    myDiagram.nodeTemplate =
-    new go.Node("Horizontal",
-        // the entire node will have a light-blue background
-        { background: "#44CCFF" })
-        .add(
-        new go.Picture(
-                // Pictures should normally have an explicit width and height.
-                // This picture has a red background, only visible when there is no source set
-                // or when the image is partially transparent.
-                { margin: 10, width: 50, height: 50, background: "red" })
-                // Picture.source is data bound to the "source" attribute of the model data
-                .bind("source")),
-            new go.TextBlock("Default Text",  // the initial value for TextBlock.text
-                // some room around the text, a larger font, and a white stroke:
-                { margin: 12, stroke: "white", font: "bold 16px sans-serif" })
-                // TextBlock.text is data bound to the "name" property of the model data
-                .bind("text", "name")
-            );
+myDiagram.nodeTemplate =
+  new go.Node("Horizontal",
+      { background: "#44CCFF" })
+    .add(
+      new go.Picture({ margin: 10, width: 50, height: 50, background: "red" })
+        .bind("source"),
+      new go.TextBlock("Default Text",
+          { margin: 12, stroke: "white", font: "bold 16px sans-serif" })
+        .bind("text", "name")
+    );
 
-        myDiagram.model = new go.Model(
-        [ // note that each node data object holds whatever properties it needs;
-            // for this app we add the "name" and "source" properties
-            // because in our template above, we have defined bindings to expect them
-            { name: "Don Meow", source: "cat1.png" },
-            { name: "Copricat", source: "cat2.png" },
-            { name: "Demeter",  source: "cat3.png" },
-            { /* Empty node data, to show a node with no values from bindings */ }
-        ]);
+// define a Link template that routes orthogonally, with no arrowhead
+myDiagram.linkTemplate =
+  new go.Link(
+      // default routing is go.Routing.Normal
+      // default corner is 0
+      { routing: go.Routing.Orthogonal, corner: 5 })
+    .add(
+      // the link path, a Shape
+      new go.Shape({ strokeWidth: 3, stroke: "#555" }),
+      // if we wanted an arrowhead we would also add another Shape with toArrow defined:
+      //new go.Shape({  toArrow: "Standard", stroke: null  })
+    );
+
+  const cat1 = "{% static 'dgroup/images/cats/cat1.png' %}";
+  const cat2 = "{% static 'dgroup/images/cats/cat2.png' %}";
+  const cat3 = "{% static 'dgroup/images/cats/cat3.png' %}";
+  const cat4 = "{% static 'dgroup/images/cats/cat4.png' %}";
+  const cat5 = "{% static 'dgroup/images/cats/cat5.png' %}";
+  const cat6 = "{% static 'dgroup/images/cats/cat6.png' %}";
+
+// it's best to declare all templates before assigning the model
+myDiagram.model = new go.TreeModel(
+  [
+    { key: "1",              name: "Don Meow",   source: cat1 },
+    { key: "2", parent: "1", name: "Demeter",    source: cat2 },
+    { key: "3", parent: "1", name: "Copricat",   source: cat3 },
+    { key: "4", parent: "3", name: "Jellylorum", source: cat4 },
+    { key: "5", parent: "3", name: "Alonzo",     source: cat5 },
+    { key: "6", parent: "2", name: "Munkustrap", source: cat6 }
+  ]);
+
     </script>
     </body>
 </html>
